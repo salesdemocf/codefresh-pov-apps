@@ -1,0 +1,74 @@
+# Pipeline to generate ArgoCD application files
+
+# Required Variables
+
+# Parent Pipeline Variables
+# APPLICATION_NAME
+# The name of the Application possibly CF_REPO_NAME as a default
+# APPLICATIONS_REPOSITORY
+# - Name of VCS Repository container ArgoCD application manifests.
+# GIT_INTEGRATION_NAME
+# - Name of GIT Pipeline Integration.
+
+version: '1.0'
+stages:
+  - clone
+  - create
+  - commit
+
+steps:
+# Clone ArgoCD Applications Repository
+  clone_apps:
+    title: Cloning Applications Repository...
+    type: git-clone
+    repo: ${{CF_REPO_OWNER}}/${{APPLICATIONS_REPOSITORY}}
+    revision: main
+    git: ${{GIT_INTEGRATION_NAME}}
+    stage: clone
+
+# Create ArgoCD application Files
+  create_argocd_files:
+    title: Creation ArgoCD Application Files...
+    type: freestyle
+    image: quay.io/codefresh-contrib/yq:4
+    working_directory: ${{clone_apps}}
+    commands:
+      - echo 'Creating Development application file...'
+      - cp templates/argocd/application.yaml development/${{APPLICATION_NAME}}.yaml
+      - echo 'Replacing placeholders in Development application file...'
+      - sed -i -e 's/application-name/${{APPLICATION_NAME}}/g' development/${{APPLICATION_NAME}}.yaml
+      - sed -i -e 's/application-environment/development/g' development/${{APPLICATION_NAME}}.yaml
+      - sed -i -e 's/destination-namespace/development/g' development/${{APPLICATION_NAME}}.yaml
+      - echo 'Completed Development application file changes...'
+      - cat development/${{APPLICATION_NAME}}.yaml
+      - echo 'Creating Staging application file...'
+      - cp templates/argocd/application.yaml staging/${{APPLICATION_NAME}}.yaml
+      - echo 'Replacing placeholders in Staging application file...'
+      - sed -i -e 's/application-name/${{APPLICATION_NAME}}/g' staging/${{APPLICATION_NAME}}.yaml
+      - sed -i -e 's/application-environment/staging/g' staging/${{APPLICATION_NAME}}.yaml
+      - sed -i -e 's/destination-namespace/staging/g' staging/${{APPLICATION_NAME}}.yaml
+      - echo 'Completed Staging application file changes...'
+      - cat staging/${{APPLICATION_NAME}}.yaml
+      - echo 'Creating Production application file...'
+      - cp templates/argocd/application.yaml production/${{APPLICATION_NAME}}.yaml
+      - echo 'Replacing placeholders in Production application file...'
+      - sed -i -e 's/application-name/${{APPLICATION_NAME}}/g' production/${{APPLICATION_NAME}}.yaml
+      - sed -i -e 's/application-environment/production/g' production/${{APPLICATION_NAME}}.yaml
+      - sed -i -e 's/destination-namespace/production/g' production/${{APPLICATION_NAME}}.yaml
+      - echo 'Completed Production application file changes...'
+      - cat production/${{APPLICATION_NAME}}.yaml
+    stage: create
+
+# Commit ArgoCD Application Files
+  commit_and_push:
+    title: Committing New Application Files...
+    type: git-commit
+    arguments:
+      repo: ${{CF_REPO_OWNER}}/${{APPLICATIONS_REPOSITORY}}
+      git: ${{GIT_INTEGRATION_NAME}}
+      working_directory: '${{CF_VOLUME_PATH}}/${{APPLICATIONS_REPOSITORY}}'
+      commit_message: 'Adding ArgoCD applications files for ${{APPLICATION_NAME}}'
+      git_user_name: codefresh-automation
+      git_user_email: automation@codefresh.io
+      rebase: true
+    stage: commit
