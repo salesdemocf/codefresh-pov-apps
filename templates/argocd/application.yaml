@@ -10,7 +10,7 @@ spec:
   project: default
   source:
     path: application-name/application-environment
-    repoURL: config-repository
+    repoURL: https://github.com/github-org/config-repository.git
     targetRevision: HEAD
   destination:
     name: in-cluster
