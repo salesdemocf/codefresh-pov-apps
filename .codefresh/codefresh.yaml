@@ -7,6 +7,8 @@
 # The name of the Application possibly CF_REPO_NAME as a default
 # APPLICATIONS_REPOSITORY
 # - Name of VCS Repository container ArgoCD application manifests.
+# CONFIGURATIONS_REPOSITORY
+# - Name of VCS Repository containing configuration files.
 # GIT_INTEGRATION_NAME
 # - Name of GIT Pipeline Integration.
 
@@ -38,6 +40,7 @@ steps:
       - echo 'Replacing placeholders in Development application file...'
       - sed -i -e 's/application-name/${{APPLICATION_NAME}}/g' development/${{APPLICATION_NAME}}.yaml
       - sed -i -e 's/application-environment/development/g' development/${{APPLICATION_NAME}}.yaml
+      - sed -i -e 's/config-repository/${{CONFIGURATIONS_REPOSITORY}}/g' development/${{APPLICATION_NAME}}.yaml
       - sed -i -e 's/destination-namespace/development/g' development/${{APPLICATION_NAME}}.yaml
       - echo 'Completed Development application file changes...'
       - cat development/${{APPLICATION_NAME}}.yaml
@@ -46,6 +49,7 @@ steps:
       - echo 'Replacing placeholders in Staging application file...'
       - sed -i -e 's/application-name/${{APPLICATION_NAME}}/g' staging/${{APPLICATION_NAME}}.yaml
       - sed -i -e 's/application-environment/staging/g' staging/${{APPLICATION_NAME}}.yaml
+      - sed -i -e 's/config-repository/${{CONFIGURATIONS_REPOSITORY}}/g' staging/${{APPLICATION_NAME}}.yaml
       - sed -i -e 's/destination-namespace/staging/g' staging/${{APPLICATION_NAME}}.yaml
       - echo 'Completed Staging application file changes...'
       - cat staging/${{APPLICATION_NAME}}.yaml
@@ -54,6 +58,7 @@ steps:
       - echo 'Replacing placeholders in Production application file...'
       - sed -i -e 's/application-name/${{APPLICATION_NAME}}/g' production/${{APPLICATION_NAME}}.yaml
       - sed -i -e 's/application-environment/production/g' production/${{APPLICATION_NAME}}.yaml
+      - sed -i -e 's/config-repository/${{CONFIGURATIONS_REPOSITORY}}/g' production/${{APPLICATION_NAME}}.yaml
       - sed -i -e 's/destination-namespace/production/g' production/${{APPLICATION_NAME}}.yaml
       - echo 'Completed Production application file changes...'
       - cat production/${{APPLICATION_NAME}}.yaml
