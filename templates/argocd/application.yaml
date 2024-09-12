@@ -9,7 +9,7 @@ metadata:
 spec:
   project: default
   source:
-    path: application-name/application-environment
+    path: application-name/overlays/application-environment
     repoURL: https://github.com/github-org/config-repository.git
     targetRevision: HEAD
   destination:

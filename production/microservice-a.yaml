@@ -9,7 +9,7 @@ metadata:
 spec:
   project: default
   source:
-    path: microservice-a/production
+    path: microservice-a/overlays/production
     repoURL: https://github.com/salesdemocf/codefresh-pov-configs.git
     targetRevision: HEAD
   destination:
